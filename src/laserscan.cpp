@@ -17,13 +17,15 @@ void messageCallback(const sensor_msgs::LaserScan::ConstPtr& scan_in)
     ChannelFloat32 channel;
     ROS_INFO("I heard something %f - %f", scan_in->angle_min, scan_in->angle_max);
 
+    scan_out.header.frame_id = scan_in->header.frame_id;
+
     for (int i = 0; i < numberPoints; i++) {
         double angle = i * scan_in->angle_increment;
         double range = scan_in->ranges[i];
         Point32 point;
 
-        point.x = range * sin(angle);
-        point.y = range * cos(angle);
+        point.x = range * cos(angle);
+        point.y = range * sin(angle);
         point.z = 0;
         channel.values.push_back(10);
 
