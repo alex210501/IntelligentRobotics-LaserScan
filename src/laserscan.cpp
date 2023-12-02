@@ -1,7 +1,6 @@
 #include <math.h>
 
 #include "ros/ros.h"
-#include "geometry_msgs/Point32.h"
 #include "sensor_msgs/LaserScan.h"
 #include "sensor_msgs/PointCloud.h"
 
@@ -9,11 +8,13 @@ ros::Publisher pub;
 
 typedef sensor_msgs::PointCloud PointCloud;
 typedef geometry_msgs::Point32 Point32;
+typedef sensor_msgs::ChannelFloat32 ChannelFloat32;
 
 void messageCallback(const sensor_msgs::LaserScan::ConstPtr& scan_in)
 {
     int numberPoints = (scan_in->angle_max - scan_in->angle_min) / scan_in->angle_increment;
     PointCloud scan_out;
+    ChannelFloat32 channel;
     ROS_INFO("I heard something %f - %f", scan_in->angle_min, scan_in->angle_max);
 
     for (int i = 0; i < numberPoints; i++) {
@@ -24,9 +25,12 @@ void messageCallback(const sensor_msgs::LaserScan::ConstPtr& scan_in)
         point.x = range * sin(angle);
         point.y = range * cos(angle);
         point.z = 0;
+        channel.values.push_back(10);
 
         scan_out.points.push_back(point);
     }
+
+    scan_out.channels.push_back(channel);
 
     pub.publish(scan_out);
 }
