@@ -3,11 +3,6 @@
 
 #include "defines.h"
 
-#define SCAN_TOPIC     ("/scan")
-#define COORDS_TOPIC   ("/coords")
-#define PERSONS_TOPIC  ("/persons")
-
-
 class Lidar {
     ros::NodeHandle n;
     ros::Publisher pubCoords, pubPersons;
@@ -16,7 +11,7 @@ class Lidar {
     void polarToCoordinate(const LaserScanConstPtr&, PointCloud&);
 
 public:
-    Lidar(int, char **);
+    Lidar();
     void run();
     void messageCallback(const LaserScanConstPtr&);
 };

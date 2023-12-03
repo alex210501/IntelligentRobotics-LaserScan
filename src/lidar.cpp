@@ -1,9 +1,13 @@
 #include "cluster.h"
 #include "lidar.h"
 
-Lidar::Lidar(int argc, char **argv) {
-    ros::init(argc, argv, "laserscan");
+#define COORDS_COLOR   (0x00ff00)
+#define PERSONS_COLOR  (0xffa500)
+#define SCAN_TOPIC     ("/scan")
+#define COORDS_TOPIC   ("/coords")
+#define PERSONS_TOPIC  ("/persons")
 
+Lidar::Lidar() {
     sub = n.subscribe(SCAN_TOPIC, 1000, &Lidar::messageCallback, this);
     pubCoords = n.advertise<PointCloud>(COORDS_TOPIC, 1000);
     pubPersons = n.advertise<PointCloud>(PERSONS_TOPIC, 1000);
@@ -26,10 +30,13 @@ void Lidar::messageCallback(const LaserScanConstPtr& scan_in) {
 
     // Get position of each person by computing the average of each cluster
     for (auto c: clusters) {
+        int rgb = PERSONS_COLOR;
+        
         persons.points.push_back(c.getAverage());
-        personsChannel.values.push_back(30);
+        personsChannel.values.push_back(*reinterpret_cast<float*>(&rgb));
     }
 
+    personsChannel.name = "rgb";
     persons.channels.push_back(personsChannel);
 
     pubCoords.publish(coords);
@@ -46,16 +53,18 @@ void Lidar::polarToCoordinate(const LaserScanConstPtr& in, PointCloud& pc) {
 
         // Add only valid ranges
         if (isinf(range)) continue;
-        
+
+        int rgb = COORDS_COLOR;        
         Point32 p;
         
         p.x = range * cos(angle);
         p.y = range * sin(angle);
         p.z = 0;
 
-        channel.values.push_back(10);
+        channel.values.push_back(*reinterpret_cast<float*>(&rgb));
         pc.points.push_back(p);
     }
 
+    channel.name = "rgb";
     pc.channels.push_back(channel);
 } 
