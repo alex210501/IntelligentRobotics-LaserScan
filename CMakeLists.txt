@@ -206,6 +206,6 @@ include_directories(
 
 include_directories( include ${catkin_INCLUDE_DIRS} )
 
-add_executable(ex4_laserscan src/laserscan.cpp)
+add_executable(ex4_laserscan src/laserscan.cpp src/lidar.cpp)
 
 target_link_libraries(ex4_laserscan ${catkin_LIBRARIES})
